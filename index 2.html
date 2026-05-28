@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Arunachalam — Video Editor & Cinematographer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0a;
+    --bg2: #111111;
+    --bg3: #181818;
+    --accent: #c8f542;
+    --accent2: #a3d420;
+    --text: #f0ede8;
+    --muted: #888880;
+    --border: rgba(255,255,255,0.08);
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 10px; height: 10px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s, height 0.2s, background 0.2s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.25s, height 0.25s, opacity 0.2s;
+    opacity: 0.5;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* Nav */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 900;
+    padding: 1.5rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  nav.scrolled {
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(12px);
+    border-color: var(--border);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 3rem 5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-profile {
+    position: absolute;
+    top: 12rem;
+    right: 8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    z-index: 2;
+  }
+  .hero-profile-img {
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top center;
+    border: 2px solid rgba(200,245,66,0.5);
+    box-shadow: 0 0 30px rgba(200,245,66,0.12);
+    filter: grayscale(30%);
+  }
+  .hero-profile-tag {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 0.4rem 1.2rem;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.05);
+  }
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-display);
+    font-size: clamp(8rem, 18vw, 22rem);
+    letter-spacing: -0.02em;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.04);
+    white-space: nowrap;
+    pointer-events: none;
+    user-select: none;
+  }
+  .hero-tag {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(200,245,66,0.08);
+    border: 1px solid rgba(200,245,66,0.2);
+    padding: 0.35rem 0.75rem;
+    border-radius: 2px;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.8s 0.2s both;
+  }
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(4rem, 10vw, 11rem);
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    animation: fadeUp 0.8s 0.35s both;
+  }
+  .hero-title span { color: var(--accent); }
+  .hero-sub {
+    margin-top: 2rem;
+    max-width: 480px;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--muted);
+    animation: fadeUp 0.8s 0.5s both;
+  }
+  .hero-cta {
+    margin-top: 2.5rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    animation: fadeUp 0.8s 0.65s both;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0a0a;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.85rem 2rem;
+    border: none;
+    border-radius: 2px;
+    cursor: none;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s, transform 0.15s;
+  }
+  .btn-primary:hover { background: var(--accent2); transform: translateY(-2px); }
+  .btn-outline {
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.85rem 2rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    cursor: none;
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+  .hero-scroll {
+    position: absolute;
+    right: 3rem;
+    bottom: 5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    animation: fadeUp 0.8s 0.8s both;
+  }
+  .hero-scroll span {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    writing-mode: vertical-rl;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  .hero-number {
+    position: absolute;
+    top: 50%;
+    right: 3rem;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    animation: fadeUp 0.8s 0.9s both;
+  }
+  .hero-num-item {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    color: var(--muted);
+    cursor: none;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .hero-num-item::before {
+    content: '';
+    width: 16px;
+    height: 1px;
+    background: var(--muted);
+    transition: width 0.2s, background 0.2s;
+  }
+  .hero-num-item:hover { color: var(--accent); }
+  .hero-num-item:hover::before { width: 28px; background: var(--accent); }
+
+  /* Section base */
+  section { padding: 8rem 3rem; }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    max-width: 80px;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6vw, 6rem);
+    line-height: 0.95;
+    letter-spacing: 0.01em;
+    margin-bottom: 3rem;
+  }
+
+  /* Works */
+  #works { background: var(--bg); }
+  .works-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1rem;
+  }
+  .work-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    background: var(--bg3);
+    cursor: none;
+  }
+  .work-item:nth-child(1) { grid-column: span 5; aspect-ratio: 4/5; }
+  .work-item:nth-child(2) { grid-column: span 7; aspect-ratio: 16/10; }
+  .work-item:nth-child(3) { grid-column: span 4; aspect-ratio: 4/5; }
+  .work-item:nth-child(4) { grid-column: span 4; aspect-ratio: 4/5; }
+  .work-item:nth-child(5) { grid-column: span 4; aspect-ratio: 4/5; }
+  .work-item:nth-child(6) { grid-column: span 7; aspect-ratio: 16/9; }
+  .work-item:nth-child(7) { grid-column: span 5; aspect-ratio: 16/9; }
+
+  .work-thumb {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.4s;
+    filter: brightness(0.75) saturate(0.8);
+  }
+  .work-item:hover .work-thumb { transform: scale(1.06); filter: brightness(0.6) saturate(0.6); }
+  .work-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .work-item:hover .work-overlay { opacity: 1; }
+  .work-cat {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+  }
+  .work-name {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    letter-spacing: 0.04em;
+    color: #fff;
+  }
+
+  /* Commercial section */
+  #commercial { background: var(--bg2); }
+  .commercial-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .comm-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    background: var(--bg3);
+    aspect-ratio: 16/10;
+    cursor: none;
+  }
+  .comm-item:nth-child(1) { grid-column: span 2; aspect-ratio: 16/7; }
+  .comm-placeholder {
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.1);
+  }
+  .comm-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .comm-item:hover .comm-overlay { opacity: 1; }
+
+  /* About */
+  #about { background: var(--bg); }
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5rem;
+    align-items: start;
+  }
+  .about-left { }
+  .about-bio {
+    font-size: 1.1rem;
+    line-height: 1.85;
+    color: var(--muted);
+    margin-bottom: 2.5rem;
+  }
+  .about-bio strong { color: var(--text); font-weight: 400; }
+  .about-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    border: 1px solid var(--border);
+  }
+  .stat-box {
+    padding: 1.5rem;
+    border: 1px solid var(--border);
+  }
+  .stat-num {
+    font-family: var(--font-display);
+    font-size: 3rem;
+    letter-spacing: 0.02em;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+  .about-right { }
+  .what-i-bring {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 2.5rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+  }
+  .bring-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .bring-text {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: var(--muted);
+  }
+  .services-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .service-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .service-num {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--accent);
+    opacity: 0.6;
+    min-width: 24px;
+  }
+  .service-name {
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 400;
+  }
+  .service-arrow {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 0.85rem;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .service-item:hover .service-arrow { color: var(--accent); transform: translateX(4px); }
+
+  /* ── Video Carousel ── */
+  #videos { background: var(--bg); border-top: 1px solid var(--border); }
+
+  .video-carousel-wrap {
+    position: relative;
+    margin: 0 -3rem;
+    padding: 0 3rem;
+  }
+  .video-carousel {
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 1rem;
+    cursor: grab;
+  }
+  .video-carousel:active { cursor: grabbing; }
+  .video-carousel::-webkit-scrollbar { display: none; }
+
+  .video-card {
+    flex: 0 0 340px;
+    scroll-snap-align: start;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+  .video-card:hover { border-color: rgba(200,245,66,0.25); transform: translateY(-4px); }
+
+  .video-card video {
+    width: 100%;
+    aspect-ratio: 9/16;
+    object-fit: cover;
+    display: block;
+    background: #000;
+  }
+  .video-card.landscape video { aspect-ratio: 16/9; }
+
+  .video-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px; height: 52px;
+    background: rgba(200,245,66,0.12);
+    border: 1.5px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+    pointer-events: none;
+  }
+  .video-play-btn svg { width: 20px; height: 20px; fill: var(--accent); margin-left: 3px; }
+  .video-card:hover .video-play-btn { background: rgba(200,245,66,0.22); transform: translate(-50%, -50%) scale(1.08); }
+  .video-card.playing .video-play-btn { opacity: 0; }
+
+  .video-meta {
+    padding: 1rem 1.1rem 1.2rem;
+    border-top: 1px solid var(--border);
+  }
+  .video-cat {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+  }
+  .video-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    letter-spacing: 0.04em;
+    color: var(--text);
+  }
+
+  .carousel-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+  }
+  .carousel-btn {
+    width: 42px; height: 42px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    font-size: 1rem;
+    cursor: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+  }
+  .carousel-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(200,245,66,0.06); }
+  .carousel-progress {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+    max-width: 200px;
+  }
+  .carousel-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 1px;
+    transition: width 0.3s ease;
+    width: 25%;
+  }
+
+  /* Grid video play icon */
+  .work-play-icon {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px; height: 52px;
+    background: rgba(0,0,0,0.45);
+    border: 1.5px solid rgba(200,245,66,0.7);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    pointer-events: none;
+  }
+  .work-item:hover .work-play-icon,
+  .comm-item:hover .work-play-icon { opacity: 1; transform: translate(-50%, -50%) scale(1.08); }
+  .work-item.playing .work-play-icon,
+  .comm-item.playing .work-play-icon { opacity: 0 !important; }
+
+  /* Upload hint card */
+  .video-upload-hint {
+    flex: 0 0 240px;
+    scroll-snap-align: start;
+    background: transparent;
+    border: 1px dashed rgba(200,245,66,0.2);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    aspect-ratio: 9/16;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  .upload-icon {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(200,245,66,0.25);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    font-size: 1.1rem;
+  }
+
+  /* CTA */
+  #contact {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+  }
+  .cta-inner {
+    max-width: 100%;
+  }
+  .cta-headline {
+    font-family: var(--font-display);
+    font-size: clamp(3.5rem, 8vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    margin-bottom: 2rem;
+  }
+  .cta-headline span { color: var(--accent); }
+  .cta-sub {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--muted);
+    max-width: 500px;
+    margin-bottom: 3rem;
+  }
+  .cta-links {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+  .contact-detail {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .contact-detail:hover { color: var(--text); }
+  .contact-detail .dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* Photography Grid */
+  #photography { background: var(--bg2); border-top: 1px solid var(--border); }
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+  .photo-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+    aspect-ratio: 4 / 5;
+    background: var(--bg3);
+    cursor: none;
+  }
+  .photo-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.4s;
+    filter: brightness(0.85) saturate(0.9);
+  }
+  .photo-item:hover .photo-thumb {
+    transform: scale(1.06);
+    filter: brightness(0.6) saturate(0.7);
+  }
+  .photo-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .photo-item:hover .photo-overlay { opacity: 1; }
+  .photo-cat {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+  }
+  .photo-name {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    letter-spacing: 0.04em;
+    color: #fff;
+  }
+
+  /* Footer */
+  footer {
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 2rem 3rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-copy {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .social-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .social-link {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .social-link:hover { color: var(--accent); }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.4; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Marquee */
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 0;
+    background: var(--bg2);
+  }
+  .marquee-track {
+    display: flex;
+    gap: 3rem;
+    animation: marquee 18s linear infinite;
+    width: max-content;
+  }
+  .marquee-item {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .marquee-item .dot { color: var(--accent); }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links { display: none; }
+    section { padding: 5rem 1.5rem; }
+    .hero { padding: 0 1.5rem 4rem; }
+    .hero-scroll, .hero-number { display: none; }
+    .works-grid { grid-template-columns: 1fr 1fr; }
+    .work-item:nth-child(n) { grid-column: span 1; aspect-ratio: 3/4; }
+    .commercial-grid { grid-template-columns: 1fr; }
+    .comm-item:nth-child(1) { grid-column: span 1; }
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .cta-links { flex-direction: column; gap: 1rem; align-items: flex-start; }
+  }
+
+  /* Contact section photo */
+  #contact {
+    position: relative;
+  }
+  .cta-layout {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4rem;
+    align-items: center;
+  }
+  .cta-photo-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cta-photo {
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: top center;
+    border: 3px solid var(--accent);
+    box-shadow: 0 0 40px rgba(200,245,66,0.15), 0 0 0 6px rgba(200,245,66,0.08);
+    filter: grayscale(20%);
+    transition: filter 0.3s, box-shadow 0.3s;
+  }
+  .cta-photo:hover {
+    filter: grayscale(0%);
+    box-shadow: 0 0 60px rgba(200,245,66,0.25), 0 0 0 8px rgba(200,245,66,0.12);
+  }
+
+  /* Footer social icons */
+  .footer-social-icons {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .footer-icon-link {
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    text-decoration: none;
+    transition: border-color 0.2s, color 0.2s, background 0.2s;
+    flex-shrink: 0;
+  }
+  .footer-icon-link svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+  .footer-icon-link:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(200,245,66,0.06);
+  }
+
+  @media (max-width: 768px) {
+    .cta-layout { grid-template-columns: 1fr; }
+    .cta-photo-wrap { order: -1; }
+    .cta-photo { width: 180px; height: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Nav -->
+<nav id="nav">
+  <a href="#" class="nav-logo">ARUN<span>.</span></a>
+  <ul class="nav-links">
+    <li><a href="#works">Works</a></li>
+    <li><a href="#commercial">Commercial</a></li>
+    <li><a href="#videos">Videos</a></li>
+    <li><a href="#photography">Photos</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero" id="home">
+  <div class="hero-bg-text" aria-hidden="true">ARUN</div>
+  <div>
+    <div class="hero-tag">Video Editor &amp; Cinematographer</div>
+    <h1 class="hero-title">
+      Hello,<br />I'm <span>Arun</span>
+    </h1>
+    <p class="hero-sub">
+      I believe brevity is key. My editing and digital designs are all about minimalism and elegance — from script to screen.
+    </p>
+    <div class="hero-cta">
+      <a href="#works" class="btn-primary">View My Work</a>
+      <a href="#contact" class="btn-outline">Work With Me</a>
+    </div>
+  </div>
+  <div class="hero-scroll" aria-hidden="true">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+  <div class="hero-profile">
+    <img src="Photos/round-photo.jpg" class="hero-profile-img" alt="Arun" />
+    <div class="hero-profile-tag">Arunachalam Arun</div>
+  </div>
+</section>
+
+<!-- Marquee -->
+<div class="marquee-wrap" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="marquee-item">Video Editing <span class="dot">✦</span></div>
+    <div class="marquee-item">Cinematography <span class="dot">✦</span></div>
+    <div class="marquee-item">Content Creation <span class="dot">✦</span></div>
+    <div class="marquee-item">Social Media <span class="dot">✦</span></div>
+    <div class="marquee-item">Content Writing<span class="dot">✦</span></div>
+    <div class="marquee-item">Reels &amp; Promos <span class="dot">✦</span></div>
+    <div class="marquee-item">Brand Films <span class="dot">✦</span></div>
+    <div class="marquee-item">Digital Marketing <span class="dot">✦</span></div>
+    <!-- duplicate for seamless loop -->
+    <div class="marquee-item">Video Editing <span class="dot">✦</span></div>
+    <div class="marquee-item">Cinematography <span class="dot">✦</span></div>
+    <div class="marquee-item">Content Creation <span class="dot">✦</span></div>
+    <div class="marquee-item">Social Media <span class="dot">✦</span></div>
+    <div class="marquee-item">Content Writing<span class="dot">✦</span></div>
+    <div class="marquee-item">Reels &amp; Promos <span class="dot">✦</span></div>
+    <div class="marquee-item">Brand Films <span class="dot">✦</span></div>
+    <div class="marquee-item">Digital Marketing <span class="dot">✦</span></div>
+  </div>
+</div>
+
+<!-- Recent Works -->
+<!-- HOW TO ADD YOUR VIDEOS HERE:
+     1. Create a "videos" folder next to index.html
+     2. Put your .mp4 files inside it
+     3. Replace src="videos/works-01.mp4" with your actual filename
+     4. Change work-cat and work-name text to match your project
+     5. The browser auto-generates the thumbnail from the first frame!
+-->
+<section id="works">
+  <div class="section-label reveal">Reel</div>
+  <h2 class="section-title reveal">RECENT<br />WORKS</h2>
+
+  <div class="video-carousel-wrap reveal">
+    <div class="video-carousel" id="videoCarousel">
+
+      <!-- ── VIDEO CARD 1 ── Replace src with your actual video file -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-01.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Reel</div>
+          <div class="video-title">Medical Advisor</div>
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 2 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-02.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Reel</div>
+          <div class="video-title">Motivation Speaker</div>
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 3 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-03.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Reel</div>
+          <div class="video-title">Educational Consultancy</div>
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 4 — Landscape example ── -->
+      <div class="video-card " onclick="toggleVideo(this)">
+        <video src="videos/works-04.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Reel</div>
+          <div class="video-title">Interior Designer</div>
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 5 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-05.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Reel</div>
+          <div class="video-title">Herbal Awarness</div>
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 6 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-06.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Reel</div>
+          <div class="video-title">Bags Manufacturing</div>
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 7 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-07.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Reel</div>
+          <div class="video-title">Furniture Ad</div>
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 8 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-08.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Reel</div>
+          <div class="video-title">Event Decorations</div>
+        </div>
+      </div>
+
+       <!-- ── VIDEO CARD 9 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-09.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Reel</div>
+          <div class="video-title">Beauty Product Ad</div>
+        </div>
+      </div>
+
+        <!-- ── VIDEO CARD 10 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-10.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Reel</div>
+          <div class="video-title">Welbeing Bags</div>
+        </div>
+      </div>
+
+       <!-- ── VIDEO CARD 11 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-11.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Model Shoot</div>
+          <div class="video-title">Sowmi Photography</div>
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 12 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="videos/works-12.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+          <div class="video-cat">Product launch</div>
+          <div class="video-title">Haash Herbs</div>
+        </div>
+      </div>
+
+    </div><!-- end carousel -->
+
+    <div class="carousel-nav">
+      <button class="carousel-btn" id="prevBtn" aria-label="Previous">←</button>
+      <button class="carousel-btn" id="nextBtn" aria-label="Next">→</button>
+      <div class="carousel-progress"><div class="carousel-bar" id="carouselBar"></div></div>
+    </div>
+  </div>
+</section>
+<!-- Cinematic Videos -->
+<!-- HOW TO ADD YOUR VIDEOS HERE:
+     Replace src="videos/commercial-01.mp4" with your actual filename
+-->
+<section id="commercial">
+  <div class="section-label reveal">Commercial</div>
+  <h2 class="section-title reveal">Cinematic<br />Works</h2>
+  <div class="commercial-grid reveal">
+
+    <div class="comm-item" onclick="toggleVideo(this)">
+      <video class="work-thumb" src="Commercial/commercial-01.mp4.mp4" loop preload="metadata" playsinline></video>
+      <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
+      <div class="comm-overlay">
+        <div class="work-cat">Event Shoot</div>
+        <div class="work-name">Puberty Function</div>
+      </div>
+    </div>
+
+    <div class="comm-item" onclick="toggleVideo(this)">
+      <video class="work-thumb" src="Commercial/commercial-05.mp4.mp4" loop preload="metadata" playsinline></video>
+      <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
+      <div class="comm-overlay">
+        <div class="work-cat">Event Shoot</div>
+        <div class="work-name">Admission Pooja</div>
+      </div>
+    </div>
+
+    <div class="comm-item" onclick="toggleVideo(this)">
+      <video class="work-thumb" src="Commercial/commercial-03.mp4.mp4" loop preload="metadata" playsinline></video>
+      <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
+      <div class="comm-overlay">
+        <div class="work-cat">Event Shoot</div>
+        <div class="work-name">Puberty Function</div>
+      </div>
+    </div>
+
+    <div class="comm-item" onclick="toggleVideo(this)">
+      <video class="work-thumb" src="Commercial/commercial-04.mp4.mp4" loop preload="metadata" playsinline></video>
+      <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
+      <div class="comm-overlay">
+        <div class="work-cat">Manufacturing</div>
+        <div class="work-name">Welbeing Bags and gifts</div>
+      </div>
+    </div>
+
+    <div class="comm-item" onclick="toggleVideo(this)">
+      <video class="work-thumb" src="Commercial/commercial-02.mp4.mp4" loop preload="metadata" playsinline></video>
+      <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
+      <div class="comm-overlay">
+        <div class="work-cat">Model shoot</div>
+        <div class="work-name">Cinematic Song</div>
+      </div>
+    </div>
+
+    <div class="comm-item" onclick="toggleVideo(this)">
+      <video class="work-thumb" src="Commercial/commercial-06.mp4.mp4" loop preload="metadata" playsinline></video>
+      <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
+      <div class="comm-overlay">
+        <div class="work-cat">Event shoot</div>
+        <div class="work-name">Naming Ceremony</div>
+      </div>
+    </div>
+
+    <div class="comm-item" onclick="toggleVideo(this)">
+      <video class="work-thumb" src="Commercial/commercial-07.mp4.mp4" loop preload="metadata" playsinline></video>
+      <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
+      <div class="comm-overlay">
+        <div class="work-cat">Cheif guest AV</div>
+        <div class="work-name">VMLS College</div>
+      </div>
+    </div>
+
+    <div class="comm-item" onclick="toggleVideo(this)">
+      <video class="work-thumb" src="Commercial/commercial-08.mp4.mp4" loop preload="metadata" playsinline></video>
+      <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
+      <div class="comm-overlay">
+        <div class="work-cat">Event Shoot</div>
+        <div class="work-name">Naming Ceremony</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Photography / Model Shoots -->
+<section id="photography">
+  <div class="section-label reveal">Photography</div>
+  <h2 class="section-title reveal">Model<br />Shoots</h2>
+  <div class="photo-grid reveal">
+
+    <div class="photo-item">
+      <img src="Photography/model-01.jpg" alt="Model Shoot" class="photo-thumb" />
+      <div class="photo-overlay">
+        <div class="photo-cat">Model Shoot</div>
+        <div class="photo-name">Portrait Series</div>
+      </div>
+    </div>
+
+    <div class="photo-item">
+      <img src="Photography/model-02.jpg" alt="Model Shoot" class="photo-thumb" />
+      <div class="photo-overlay">
+        <div class="photo-cat">Model Shoot</div>
+        <div class="photo-name">Outdoor Series</div>
+      </div>
+    </div>
+
+    <div class="photo-item">
+      <img src="Photography/model-03.JPG" alt="Model Shoot" class="photo-thumb" />
+      <div class="photo-overlay">
+        <div class="photo-cat">Model Shoot</div>
+        <div class="photo-name">Studio Series</div>
+      </div>
+    </div>
+
+    <div class="photo-item">
+      <img src="Photography/model-04.jpg" alt="Model Shoot" class="photo-thumb" />
+      <div class="photo-overlay">
+        <div class="photo-cat">Model Shoot</div>
+        <div class="photo-name">Portrait Series</div>
+      </div>
+    </div>
+
+    <div class="photo-item">
+      <img src="Photography/model-05.jpg" alt="Model Shoot" class="photo-thumb" />
+      <div class="photo-overlay">
+        <div class="photo-cat">Model Shoot</div>
+        <div class="photo-name">Outdoor Series</div>
+      </div>
+    </div>
+
+    <div class="photo-item">
+      <img src="Photography/model-06.JPG" alt="Model Shoot" class="photo-thumb" />
+      <div class="photo-overlay">
+        <div class="photo-cat">Model Shoot</div>
+        <div class="photo-name">Fashion Series</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ VIDEO REEL CAROUSEL ══
+     HOW TO ADD YOUR VIDEOS:
+     1. Put your .mp4 files in the same folder as index.html
+     2. Replace src="videos/your-video-1.mp4" with your actual filename
+     3. Change the category (.video-cat) and title (.video-title) text
+     4. Add or remove <div class="video-card"> blocks as needed
+     5. For landscape (horizontal) videos add class="video-card landscape"
+ ══════════════════════════════ -->
+<section id="videos">
+  <div class="section-label reveal">Reel</div>
+  <h2 class="section-title reveal">BEHIND THE SCENES<br /></h2>
+
+  <div class="video-carousel-wrap reveal">
+    <div class="video-carousel" id="videoCarousel">
+
+      <!-- ── VIDEO CARD 1 ── Replace src with your actual video file -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="Reels/reel-01.mp4.mov" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 2 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="Reels/reel-02.mp4.mp4" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta"> 
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 3 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="Reels/reel-03.mp4.mov" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 4 — Landscape example ── -->
+      <div class="video-card " onclick="toggleVideo(this)">
+        <video src="Reels/reel-04.mp4.mov" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+        </div>
+      </div>
+
+      <!-- ── VIDEO CARD 5 ── -->
+      <div class="video-card" onclick="toggleVideo(this)">
+        <video src="Reels/" loop preload="metadata" playsinline></video>
+        <div class="video-play-btn">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </div>
+        <div class="video-meta">
+        </div>
+      </div>
+
+      <!-- ── ADD MORE CARDS ABOVE THIS LINE ── -->
+      <div class="video-upload-hint">
+        <div class="upload-icon">+</div>
+        <span>Drop your<br/>video files<br/>here</span>
+      </div>
+
+    </div><!-- end carousel -->
+
+    <div class="carousel-nav">
+      <button class="carousel-btn" id="prevBtn" aria-label="Previous">←</button>
+      <button class="carousel-btn" id="nextBtn" aria-label="Next">→</button>
+      <div class="carousel-progress"><div class="carousel-bar" id="carouselBar"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- About -->
+<section id="about">
+  <div class="section-label reveal">About</div>
+  <div class="about-grid">
+    <div class="about-left reveal">
+      <h2 class="section-title" style="margin-bottom:2rem;">Who<br />I Am</h2>
+      <p class="about-bio">
+        I'm <strong>Arun</strong>, a Freelance video editor, Content writer, and Social media manager running a digital services agency. I specialize in <strong>end-to-end content creation</strong> — from scripting to shooting to editing.
+      </p>
+      <p class="about-bio">
+        Whether it's a reel, promo, or full campaign, I bring ideas to life with a creative and clean touch.
+      </p>
+      <div class="about-stats">
+        <div class="stat-box">
+          <div class="stat-num">50+</div>
+          <div class="stat-label">Projects Done</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">3+</div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">1</div>
+          <div class="stat-label">Stop Workflow</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num">∞</div>
+          <div class="stat-label">Creative Vision</div>
+        </div>
+      </div>
+    </div>
+    <div class="about-right reveal">
+      <div class="what-i-bring">
+        <div class="bring-title">What I Bring</div>
+        <p class="bring-text">
+          I'm a creative all-rounder who handles everything from script to screen. With a strong eye for storytelling, I bring ideas to life through engaging videos, sharp content writing, and trend-savvy social media strategies — all with quick turnaround and a one-stop workflow.
+        </p>
+      </div>
+      <div class="services-list">
+        <div class="service-item">
+          <span class="service-num">01</span>
+          <span class="service-name">Video Editing &amp; Post-Production</span>
+          <span class="service-arrow">→</span>
+        </div>
+        <div class="service-item">
+          <span class="service-num">02</span>
+          <span class="service-name">Cinematography &amp; Shooting</span>
+          <span class="service-arrow">→</span>
+        </div>
+        <div class="service-item">
+          <span class="service-num">03</span>
+          <span class="service-name">Reels, Promos &amp; Campaigns</span>
+          <span class="service-arrow">→</span>
+        </div>
+        <div class="service-item">
+          <span class="service-num">04</span>
+          <span class="service-name">Scripting &amp; Content Writing</span>
+          <span class="service-arrow">→</span>
+        </div>
+        <div class="service-item">
+          <span class="service-num">05</span>
+          <span class="service-name">Social Media Management</span>
+          <span class="service-arrow">→</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA / Contact -->
+<section id="contact">
+  <div class="cta-inner">
+    <div class="cta-layout">
+      <div class="cta-left">
+        <div class="section-label reveal">Work With Me</div>
+        <h2 class="cta-headline reveal">
+          Got an<br />Idea<span>?</span>
+        </h2>
+        <p class="cta-sub reveal">
+          From scripting to editing, I'll help you bring your vision to life in a way that stands out. Just hit me up and let's make something awesome together!
+        </p>
+        <div class="reveal">
+          <a href="mailto:works.arunachalam@gmail.com" class="btn-primary">
+            For Enquiries
+          </a>
+        </div>
+        <div class="cta-links reveal">
+          <a href="tel:6382042504" class="contact-detail">
+            <span class="dot"></span>
+            Contact
+          </a>
+          <a href="https://www.instagram.com/the.arunnnnnn?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener" class="contact-detail">
+            <span class="dot"></span>
+            Instagram
+          </a>
+          <a href="https://wa.me/916382042504" target="_blank" rel="noopener" class="contact-detail">
+            <span class="dot"></span>
+            WhatsApp
+          </a>
+        </div>
+      </div>
+      <div class="cta-photo-wrap reveal">
+        <img class="cta-photo" src="Photos/conatact-photo.jpg" alt="Arunachalam" />
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">THE ARUN<span>.</span></div>
+  <div class="footer-copy">© 2026 Arunachalam. All rights reserved.</div>
+  <div class="footer-social-icons">
+    <!-- Phone -->
+    <a href="tel:6382042504" class="footer-icon-link" title="Call Arun">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+    </a>
+    <!-- Email -->
+    <a href="mailto:works.arunachalam@gmail.com" class="footer-icon-link" title="Email Arun">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+    </a>
+    <!-- Instagram -->
+    <a href="https://www.instagram.com/the.arunnnnnn" target="_blank" rel="noopener" class="footer-icon-link" title="Instagram">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+    </a>
+    <!-- WhatsApp -->
+    <a href="https://wa.me/916382042504" target="_blank" rel="noopener" class="footer-icon-link" title="WhatsApp">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animateCursor() {
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+  document.querySelectorAll('a, button, .work-item, .comm-item, .service-item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '16px';
+      cursor.style.height = '16px';
+      ring.style.width = '52px';
+      ring.style.height = '52px';
+      ring.style.opacity = '0.8';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '10px';
+      cursor.style.height = '10px';
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+      ring.style.opacity = '0.5';
+    });
+  });
+
+  // Nav scroll
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Grid video play/pause (works grid + commercial)
+  function playGridVideo(card) {
+    const vid = card.querySelector('video');
+    if (!vid) return;
+    if (vid.paused) {
+      document.querySelectorAll('.work-item video, .comm-item video').forEach(v => {
+        v.pause(); v.closest('.work-item, .comm-item').classList.remove('playing');
+      });
+      vid.muted = true;
+      vid.play();
+      card.classList.add('playing');
+    } else {
+      vid.pause();
+      card.classList.remove('playing');
+    }
+  }
+
+  // ── Video carousel ──
+  function toggleVideo(card) {
+    const vid = card.querySelector('video');
+    if (vid.paused) {
+      // pause all others first
+      document.querySelectorAll('.video-card video').forEach(v => { v.pause(); v.closest('.video-card').classList.remove('playing'); });
+      vid.play();
+      card.classList.add('playing');
+    } else {
+      vid.pause();
+      card.classList.remove('playing');
+    }
+  }
+
+  const carousel = document.getElementById('videoCarousel');
+  const bar = document.getElementById('carouselBar');
+  const cardWidth = 340 + 20; // card width + gap
+
+  function updateBar() {
+    const max = carousel.scrollWidth - carousel.clientWidth;
+    const pct = max > 0 ? (carousel.scrollLeft / max) * 75 + 25 : 25;
+    bar.style.width = Math.min(pct, 100) + '%';
+  }
+  carousel.addEventListener('scroll', updateBar, { passive: true });
+
+  document.getElementById('prevBtn').addEventListener('click', () => {
+    carousel.scrollBy({ left: -cardWidth, behavior: 'smooth' });
+  });
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    carousel.scrollBy({ left: cardWidth, behavior: 'smooth' });
+  });
+
+  // Drag-to-scroll
+  let isDragging = false, startX, startScroll;
+  carousel.addEventListener('mousedown', e => { isDragging = true; startX = e.pageX; startScroll = carousel.scrollLeft; carousel.style.userSelect = 'none'; });
+  window.addEventListener('mousemove', e => { if (!isDragging) return; carousel.scrollLeft = startScroll - (e.pageX - startX); });
+  window.addEventListener('mouseup', () => { isDragging = false; carousel.style.userSelect = ''; });
+
+  // ── Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
