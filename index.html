@@ -856,21 +856,177 @@
     to { transform: translateX(-50%); }
   }
 
-  /* Responsive */
+  /* ═══════════════════════════════════════
+     RESPONSIVE — Tablet (max 1024px)
+  ═══════════════════════════════════════ */
+  @media (max-width: 1024px) {
+    section { padding: 6rem 2rem; }
+    .hero { padding: 0 2rem 4rem; }
+
+    /* Hero profile smaller on tablet */
+    .hero-profile { top: 8rem; right: 2rem; }
+    .hero-profile-img { width: 200px; height: 200px; }
+
+    /* Works grid — 2 column */
+    .works-grid { grid-template-columns: repeat(6, 1fr); }
+    .work-item:nth-child(1) { grid-column: span 3; }
+    .work-item:nth-child(2) { grid-column: span 3; }
+    .work-item:nth-child(3) { grid-column: span 2; }
+    .work-item:nth-child(4) { grid-column: span 2; }
+    .work-item:nth-child(5) { grid-column: span 2; }
+    .work-item:nth-child(6) { grid-column: span 4; }
+    .work-item:nth-child(7) { grid-column: span 2; }
+
+    /* Commercial — 2 columns */
+    .commercial-grid { grid-template-columns: repeat(2, 1fr); }
+    .comm-item:nth-child(1) { grid-column: span 2; }
+
+    /* Photo grid — 2 columns */
+    .photo-grid { grid-template-columns: repeat(2, 1fr); }
+
+    /* About grid — stack */
+    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
+
+    /* CTA layout */
+    .cta-layout { grid-template-columns: 1fr; gap: 2rem; }
+    .cta-photo-wrap { justify-content: flex-start; }
+
+    /* Footer */
+    footer { padding: 2rem; }
+  }
+
+  /* ═══════════════════════════════════════
+     RESPONSIVE — Mobile (max 768px)
+  ═══════════════════════════════════════ */
   @media (max-width: 768px) {
+
+    /* Nav — hide links, show hamburger */
     nav { padding: 1.2rem 1.5rem; }
     .nav-links { display: none; }
-    section { padding: 5rem 1.5rem; }
+    .nav-logo { font-size: 1.2rem; }
+
+    /* Hamburger menu button */
+    .nav-hamburger {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 24px;
+      height: 1.5px;
+      background: var(--text);
+      transition: all 0.3s;
+    }
+
+    /* Mobile menu open state */
+    .nav-links.open {
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(10,10,10,0.98);
+      backdrop-filter: blur(12px);
+      z-index: 800;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+    }
+    .nav-links.open a {
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+    }
+
+    /* Sections */
+    section { padding: 4rem 1.5rem; }
     .hero { padding: 0 1.5rem 4rem; }
-    .hero-scroll, .hero-number { display: none; }
-    .works-grid { grid-template-columns: 1fr 1fr; }
-    .work-item:nth-child(n) { grid-column: span 1; aspect-ratio: 3/4; }
-    .commercial-grid { grid-template-columns: 1fr; }
-    .comm-item:nth-child(1) { grid-column: span 1; }
-    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
-    footer { flex-direction: column; gap: 1rem; text-align: center; }
+
+    /* Hide decorative elements */
+    .hero-scroll { display: none; }
+    .hero-number { display: none; }
+
+    /* Hero profile — move below text on mobile */
+    .hero-profile {
+  position: absolute;
+  top: 5rem;
+  right:50%;
+  transform: translateX(50%);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+  gap: 0.75rem;
+}
+    .hero-profile-img { width: 90px; height: 90px; }
+    .hero-profile-tag { font-size: 0.65rem; padding: 0.3rem 0.8rem; }
+
+    /* Hero title smaller */
+    .hero-title { font-size: clamp(3rem, 14vw, 5rem); }
+    .hero-sub { font-size: 0.9rem; }
+    .hero-cta { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+    .btn-primary, .btn-outline { width: 100%; text-align: center; padding: 0.85rem 1rem; }
+
+    /* Works grid — single column */
+    .works-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+    .work-item:nth-child(n) { grid-column: span 1; aspect-ratio: 16/10; }
+
+    /* Commercial — single column */
+    .commercial-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+    .comm-item:nth-child(1) { grid-column: span 1; aspect-ratio: 16/9; }
+    .comm-item { aspect-ratio: 16/9; }
+
+    /* Photography — 2 column on mobile */
+    .photo-grid { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+
+    /* Video carousel — smaller cards */
+    .video-card { flex: 0 0 240px; }
+
+    /* About */
+    .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .about-stats { grid-template-columns: 1fr 1fr; }
+    .what-i-bring { padding: 1.5rem; }
+
+    /* CTA */
+    .cta-layout { grid-template-columns: 1fr; gap: 2rem; }
+    .cta-photo-wrap { display: none; }
     .cta-links { flex-direction: column; gap: 1rem; align-items: flex-start; }
+    .cta-headline { font-size: clamp(3rem, 14vw, 5rem); }
+
+    /* Footer */
+    footer {
+      flex-direction: column;
+      gap: 1.5rem;
+      text-align: center;
+      padding: 2rem 1.5rem;
+    }
+    .social-links { justify-content: center; }
+
+    /* Section title */
+    .section-title { font-size: clamp(2.5rem, 10vw, 4rem); margin-bottom: 2rem; }
+
+    /* Cursor hidden on touch */
+    .cursor, .cursor-ring { display: none; }
+    body { cursor: auto; }
+    .btn-primary, .btn-outline, .work-item, .comm-item, .video-card { cursor: pointer; }
   }
+
+  /* ═══════════════════════════════════════
+     RESPONSIVE — Small Mobile (max 480px)
+  ═══════════════════════════════════════ */
+  @media (max-width: 480px) {
+    section { padding: 3.5rem 1.2rem; }
+    .hero { padding: 0 1.2rem 3rem; }
+    .hero-title { font-size: clamp(2.8rem, 16vw, 4rem); }
+    .photo-grid { grid-template-columns: 1fr; }
+    .about-stats { grid-template-columns: 1fr 1fr; }
+    .video-card { flex: 0 0 200px; }
+    footer { padding: 1.5rem 1.2rem; }
+  }
+
+  /* Hamburger — hidden on desktop */
+  .nav-hamburger { display: none; }
 
   /* Contact section photo */
   #contact {
@@ -947,15 +1103,20 @@
 
 <!-- Nav -->
 <nav id="nav">
-  <a href="#" class="nav-logo">ARUN<span>.</span></a>
-  <ul class="nav-links">
-    <li><a href="#works">Works</a></li>
-    <li><a href="#commercial">Commercial</a></li>
-    <li><a href="#videos">Videos</a></li>
-    <li><a href="#photography">Photos</a></li>
-    <li><a href="#about">About</a></li>
-    <li><a href="#contact">Contact</a></li>
+  <a href="#" class="nav-logo">THE ARUN<span>.</span></a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#works" onclick="closeMenu()">Works</a></li>
+    <li><a href="#commercial" onclick="closeMenu()">Commercial</a></li>
+    <li><a href="#videos" onclick="closeMenu()">Videos</a></li>
+    <li><a href="#photography" onclick="closeMenu()">Photos</a></li>
+    <li><a href="#about" onclick="closeMenu()">About</a></li>
+    <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
   </ul>
+  <div class="nav-hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
 </nav>
 
 <!-- Hero -->
@@ -979,7 +1140,7 @@
     <span>Scroll</span>
   </div>
   <div class="hero-profile">
-    <img src="Photos/round-photo.jpg" class="hero-profile-img" alt="Arun" />
+    <img src="https://res.cloudinary.com/dpkte3voe/image/upload/v1780409092/round-photo_v2wr7g.jpg" class="hero-profile-img" alt="Arun" />
     <div class="hero-profile-tag">Arunachalam Arun</div>
   </div>
 </section>
@@ -1024,7 +1185,7 @@
 
       <!-- ── VIDEO CARD 1 ── Replace src with your actual video file -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-01.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407032/works-01.mp4_qgkmjj.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1036,7 +1197,7 @@
 
       <!-- ── VIDEO CARD 2 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-02.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407003/works-02.mp4_nm5pob.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1048,7 +1209,7 @@
 
       <!-- ── VIDEO CARD 3 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-03.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780406992/works-03.mp4_yr92il.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1060,7 +1221,7 @@
 
       <!-- ── VIDEO CARD 4 — Landscape example ── -->
       <div class="video-card " onclick="toggleVideo(this)">
-        <video src="videos/works-04.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780406968/works-04.mp4_zjeuia.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1072,7 +1233,7 @@
 
       <!-- ── VIDEO CARD 5 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-05.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780406813/works-05.mp4_acmvmi.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1084,7 +1245,7 @@
 
       <!-- ── VIDEO CARD 6 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-06.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780406874/works-06.mp4_oz2m6d.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1096,7 +1257,7 @@
 
       <!-- ── VIDEO CARD 7 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-07.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780406999/works-07.mp4_ax3rjj.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1108,7 +1269,7 @@
 
       <!-- ── VIDEO CARD 8 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-08.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780406994/works-08.mp4_nengrx.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1120,7 +1281,7 @@
 
        <!-- ── VIDEO CARD 9 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-09.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780406953/works-09.mp4_zna536.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1132,7 +1293,7 @@
 
         <!-- ── VIDEO CARD 10 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-10.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780406889/works-10.mp4_tl8iwz.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1144,7 +1305,7 @@
 
        <!-- ── VIDEO CARD 11 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-11.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780406944/works-11.mp4_hl8ost.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1156,7 +1317,7 @@
 
       <!-- ── VIDEO CARD 12 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="videos/works-12.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407009/works-12.mp4_ymfisk.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1185,7 +1346,7 @@
   <div class="commercial-grid reveal">
 
     <div class="comm-item" onclick="toggleVideo(this)">
-      <video class="work-thumb" src="Commercial/commercial-01.mp4.mp4" loop preload="metadata" playsinline></video>
+      <video class="work-thumb" src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407114/commercial-01.mp4_chfqdj.mp4" loop preload="metadata" playsinline></video>
       <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
       <div class="comm-overlay">
         <div class="work-cat">Event Shoot</div>
@@ -1194,7 +1355,7 @@
     </div>
 
     <div class="comm-item" onclick="toggleVideo(this)">
-      <video class="work-thumb" src="Commercial/commercial-05.mp4.mp4" loop preload="metadata" playsinline></video>
+      <video class="work-thumb" src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407252/commercial-05.mp4_lxmpyb.mp4" loop preload="metadata" playsinline></video>
       <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
       <div class="comm-overlay">
         <div class="work-cat">Event Shoot</div>
@@ -1203,7 +1364,7 @@
     </div>
 
     <div class="comm-item" onclick="toggleVideo(this)">
-      <video class="work-thumb" src="Commercial/commercial-03.mp4.mp4" loop preload="metadata" playsinline></video>
+      <video class="work-thumb" src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407210/commercial-03.mp4_cvsfpr.mp4" loop preload="metadata" playsinline></video>
       <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
       <div class="comm-overlay">
         <div class="work-cat">Event Shoot</div>
@@ -1212,7 +1373,7 @@
     </div>
 
     <div class="comm-item" onclick="toggleVideo(this)">
-      <video class="work-thumb" src="Commercial/commercial-04.mp4.mp4" loop preload="metadata" playsinline></video>
+      <video class="work-thumb" src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407145/commercial-04.mp4_nmbhbr.mp4" loop preload="metadata" playsinline></video>
       <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
       <div class="comm-overlay">
         <div class="work-cat">Manufacturing</div>
@@ -1221,7 +1382,7 @@
     </div>
 
     <div class="comm-item" onclick="toggleVideo(this)">
-      <video class="work-thumb" src="Commercial/commercial-02.mp4.mp4" loop preload="metadata" playsinline></video>
+      <video class="work-thumb" src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407142/commercial-02.mp4_h5hoj5.mp4" loop preload="metadata" playsinline></video>
       <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
       <div class="comm-overlay">
         <div class="work-cat">Model shoot</div>
@@ -1230,7 +1391,7 @@
     </div>
 
     <div class="comm-item" onclick="toggleVideo(this)">
-      <video class="work-thumb" src="Commercial/commercial-06.mp4.mp4" loop preload="metadata" playsinline></video>
+      <video class="work-thumb" src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407233/commercial-06.mp4_edtawq.mp4" loop preload="metadata" playsinline></video>
       <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
       <div class="comm-overlay">
         <div class="work-cat">Event shoot</div>
@@ -1239,7 +1400,7 @@
     </div>
 
     <div class="comm-item" onclick="toggleVideo(this)">
-      <video class="work-thumb" src="Commercial/commercial-07.mp4.mp4" loop preload="metadata" playsinline></video>
+      <video class="work-thumb" src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407220/commercial-07.mp4_j7tsq5.mp4" loop preload="metadata" playsinline></video>
       <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
       <div class="comm-overlay">
         <div class="work-cat">Cheif guest AV</div>
@@ -1248,7 +1409,7 @@
     </div>
 
     <div class="comm-item" onclick="toggleVideo(this)">
-      <video class="work-thumb" src="Commercial/commercial-08.mp4.mp4" loop preload="metadata" playsinline></video>
+      <video class="work-thumb" src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780407219/commercial-08.mp4_owz31i.mp4" loop preload="metadata" playsinline></video>
       <div class="work-play-icon"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg></div>
       <div class="comm-overlay">
         <div class="work-cat">Event Shoot</div>
@@ -1266,7 +1427,7 @@
   <div class="photo-grid reveal">
 
     <div class="photo-item">
-      <img src="Photography/model-01.jpg" alt="Model Shoot" class="photo-thumb" />
+      <img src="https://res.cloudinary.com/dpkte3voe/image/upload/v1780409008/model-01_s3fjb9.jpg" alt="Model Shoot" class="photo-thumb" />
       <div class="photo-overlay">
         <div class="photo-cat">Model Shoot</div>
         <div class="photo-name">Portrait Series</div>
@@ -1274,7 +1435,7 @@
     </div>
 
     <div class="photo-item">
-      <img src="Photography/model-02.jpg" alt="Model Shoot" class="photo-thumb" />
+      <img src="https://res.cloudinary.com/dpkte3voe/image/upload/v1780408912/model-02_pkwcil.jpg" alt="Model Shoot" class="photo-thumb" />
       <div class="photo-overlay">
         <div class="photo-cat">Model Shoot</div>
         <div class="photo-name">Outdoor Series</div>
@@ -1282,7 +1443,7 @@
     </div>
 
     <div class="photo-item">
-      <img src="Photography/model-03.JPG" alt="Model Shoot" class="photo-thumb" />
+      <img src="https://res.cloudinary.com/dpkte3voe/image/upload/v1780409667/model-03_krx651.jpg" alt="Model Shoot" class="photo-thumb" />
       <div class="photo-overlay">
         <div class="photo-cat">Model Shoot</div>
         <div class="photo-name">Studio Series</div>
@@ -1290,7 +1451,7 @@
     </div>
 
     <div class="photo-item">
-      <img src="Photography/model-04.jpg" alt="Model Shoot" class="photo-thumb" />
+      <img src="https://res.cloudinary.com/dpkte3voe/image/upload/v1780408942/model-04_vksnuh.jpg" alt="Model Shoot" class="photo-thumb" />
       <div class="photo-overlay">
         <div class="photo-cat">Model Shoot</div>
         <div class="photo-name">Portrait Series</div>
@@ -1298,7 +1459,7 @@
     </div>
 
     <div class="photo-item">
-      <img src="Photography/model-05.jpg" alt="Model Shoot" class="photo-thumb" />
+      <img src="https://res.cloudinary.com/dpkte3voe/image/upload/v1780408982/model-05_vxzjp4.jpg" alt="Model Shoot" class="photo-thumb" />
       <div class="photo-overlay">
         <div class="photo-cat">Model Shoot</div>
         <div class="photo-name">Outdoor Series</div>
@@ -1306,7 +1467,7 @@
     </div>
 
     <div class="photo-item">
-      <img src="Photography/model-06.JPG" alt="Model Shoot" class="photo-thumb" />
+      <img src="https://res.cloudinary.com/dpkte3voe/image/upload/v1780409686/model-06_pgocdq.jpg" alt="Model Shoot" class="photo-thumb" />
       <div class="photo-overlay">
         <div class="photo-cat">Model Shoot</div>
         <div class="photo-name">Fashion Series</div>
@@ -1333,7 +1494,7 @@
 
       <!-- ── VIDEO CARD 1 ── Replace src with your actual video file -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="Reels/reel-01.mp4.mov" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780056232/reel-01.mp4_ss4llc.mov" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1343,7 +1504,7 @@
 
       <!-- ── VIDEO CARD 2 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="Reels/reel-02.mp4.mp4" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780056069/reel-02.mp4_zzdjnn.mp4" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1353,7 +1514,7 @@
 
       <!-- ── VIDEO CARD 3 ── -->
       <div class="video-card" onclick="toggleVideo(this)">
-        <video src="Reels/reel-03.mp4.mov" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780056041/reel-03.mp4_xca76o.mov" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1363,7 +1524,7 @@
 
       <!-- ── VIDEO CARD 4 — Landscape example ── -->
       <div class="video-card " onclick="toggleVideo(this)">
-        <video src="Reels/reel-04.mp4.mov" loop preload="metadata" playsinline></video>
+        <video src="https://res.cloudinary.com/dpkte3voe/video/upload/v1780055892/reel-04.mp4_jmsvhl.mov" loop preload="metadata" playsinline></video>
         <div class="video-play-btn">
           <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
         </div>
@@ -1499,7 +1660,7 @@
         </div>
       </div>
       <div class="cta-photo-wrap reveal">
-        <img class="cta-photo" src="Photos/conatact-photo.jpg" alt="Arunachalam" />
+        <img class="cta-photo" src="https://res.cloudinary.com/dpkte3voe/image/upload/v1780409093/conatact-photo_yzjcsg.jpg" alt="Arunachalam" />
     </div>
   </div>
 </section>
@@ -1633,6 +1794,15 @@
     });
   }, { threshold: 0.12 });
   reveals.forEach(el => observer.observe(el));
+  // ── Hamburger menu toggle
+  function toggleMenu() {
+    const nav = document.getElementById('navLinks');
+    nav.classList.toggle('open');
+  }
+  function closeMenu() {
+    const nav = document.getElementById('navLinks');
+    nav.classList.remove('open');
+  }
 </script>
 </body>
 </html>
